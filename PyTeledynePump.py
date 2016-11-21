@@ -6,24 +6,27 @@ import pylab
 import time
 import pyqtgraph
 from datetime import datetime
-from tkinter import Tk
-from tkinter.filedialog import asksaveasfile
-from tkinter.messagebox import showerror
+from Tkinter import Tk
+from tkFileDialog import asksaveasfile
+from tkMessageBox import showerror
+#from Tkinter.filedialog import asksaveasfile
+#from Tkinter.messagebox import showerror
 from random import randint
 from collections import deque
 
 class ExampleApp(QtGui.QMainWindow, plotter.Ui_TeledynePlotter):
+    
     def __init__(self, parent=None):
     
         self.port = "/dev/ttyACM0"
-        self.baudrate = 9600
+        self.baudrate = 19200
         self.parity = serial.PARITY_NONE
         self.stopbits = serial.STOPBITS_ONE
         self.bytesize = serial.EIGHTBITS
         self.timeout = 1
         self.ser = None
         
-        #self.connect_to_pump()
+        self.connect_to_pump()
 
         pyqtgraph.setConfigOption('background', 'w') #before loading widget
         super(ExampleApp, self).__init__(parent)
@@ -39,12 +42,12 @@ class ExampleApp(QtGui.QMainWindow, plotter.Ui_TeledynePlotter):
         self.X = np.arange(self.num_points)
         self.Y = deque([0.0]*self.num_points)
         self.filename = None
-        self.plainTextEdit.appendPlainText(self.filename)
+        self.plainTextEdit.appendPlainText('No filename')
         
         self.test = False
 
     def connect_to_pump(self):
-        print("Reading from serial port {} ...".format(port))
+        print("Reading from serial port {} ...".format(self.port))
         num_attempts = 7
         for i in range(1, num_attempts):
             if i is num_attempts-1:
@@ -68,7 +71,7 @@ class ExampleApp(QtGui.QMainWindow, plotter.Ui_TeledynePlotter):
                 sleep(2)
 
     def file_header(self):
-        header = 'Hour, Minute, Second, Pressure\n'
+        header = 'Hour, Minute, Second, Pressure (psi)\n'
         return header
 
     def new_test(self):
@@ -102,19 +105,19 @@ class ExampleApp(QtGui.QMainWindow, plotter.Ui_TeledynePlotter):
             showerror("Start Test", "A test is running!")
             return
         self.Y = deque([0.0]*self.num_points)
-        #self.start_pump()
+        self.start_pump()
         self.test = True
         self.update()
 
     def start_pump(self):
         self.ser.write("RU\r")
-        dummy = self.ser.read_pump_line()
+        dummy = self.read_pump_line()
 
     def stop_test(self):
         if self.test is False:
             showerror("Stop Test", "No test running")
             return
-        #self.stop_pump()
+        self.stop_pump()
         self.test = False
         self.filename.close()
         self.filename = None
@@ -122,7 +125,23 @@ class ExampleApp(QtGui.QMainWindow, plotter.Ui_TeledynePlotter):
 
     def stop_pump(self):
         self.ser.write("ST\r")
-        dummy = self.ser.read_pump_line()
+        dummy = self.read_pump_line()
+
+    def get_data(self):
+        self.ser.write("PR\r")
+        line = self.read_pump_line()
+        if line is '':
+            self.filename.write('-9999\n')
+            print('Possible read error:\n')
+            print(line)
+        else:
+            self.filename.write(line[-5:-1]+'\n')
+        self.filename.flush()
+        dummy = self.Y.pop()
+        try:
+            self.Y.appendleft(float(line[-5:-1]))
+        except ValueError:
+            self.Y.appendleft(dummy)
 
     def read_pump_line(self):
         # return ead 
@@ -130,24 +149,14 @@ class ExampleApp(QtGui.QMainWindow, plotter.Ui_TeledynePlotter):
         leneol = len(eol)
         line = bytearray()
         while True:
-            c = ser.read(1)
+            c = self.ser.read(1)
             if c:
                 line += c
                 if line[-leneol:] == eol:
                     break
             else:
                 break
-        return line
-
-    def get_data(self):
-        #self.ser.write("PR\r")
-        #line = self.ser.read_pump_line()
-        #self.filename.write(line[-4:]+'\n')
-        self.filename.write('0000\n')
-        self.filename.flush()
-        self.Y.pop()
-        #self.Y.appendleft(int(line[-4:]))
-        self.Y.appendleft(randint(0,9999))
+        return str(line)
 
     def update(self):
         if self.test is True:
@@ -157,11 +166,15 @@ class ExampleApp(QtGui.QMainWindow, plotter.Ui_TeledynePlotter):
             self.graphicsView.plot(self.X,self.Y,pen=self.pen,clear=True)
             QtCore.QTimer.singleShot(1, self.update) # QUICKLY repeat
 
+    def close_connection(self):
+        self.ser.close()
+
 if __name__=="__main__":
     Tk().withdraw()
     app = QtGui.QApplication(sys.argv)
     form = ExampleApp()
     form.show()
     app.exec_()
+    #app.close_connection()
     print("DONE")
     exit()

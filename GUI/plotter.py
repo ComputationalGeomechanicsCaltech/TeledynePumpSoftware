@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'plotter.ui'
 #
-# Created: Fri Nov 18 09:42:50 2016
+# Created: Wed Jan 18 17:04:34 2017
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -29,26 +29,37 @@ class Ui_TeledynePlotter(object):
         TeledynePlotter.resize(1126, 895)
         self.centralwidget = QtGui.QWidget(TeledynePlotter)
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
-        self.graphicsView = PlotWidget(self.centralwidget)
-        self.graphicsView.setGeometry(QtCore.QRect(15, 91, 1091, 741))
-        self.graphicsView.setObjectName(_fromUtf8("graphicsView"))
+        self.pressure_graph = PlotWidget(self.centralwidget)
+        self.pressure_graph.setGeometry(QtCore.QRect(10, 70, 1091, 251))
+        self.pressure_graph.setObjectName(_fromUtf8("pressure_graph"))
         self.startButton = QtGui.QPushButton(self.centralwidget)
-        self.startButton.setGeometry(QtCore.QRect(700, 20, 101, 51))
+        self.startButton.setGeometry(QtCore.QRect(630, 10, 101, 51))
         self.startButton.setObjectName(_fromUtf8("startButton"))
         self.stopButton = QtGui.QPushButton(self.centralwidget)
-        self.stopButton.setGeometry(QtCore.QRect(840, 20, 101, 51))
+        self.stopButton.setGeometry(QtCore.QRect(750, 10, 101, 51))
         self.stopButton.setObjectName(_fromUtf8("stopButton"))
         self.plainTextEdit = QtGui.QPlainTextEdit(self.centralwidget)
-        self.plainTextEdit.setGeometry(QtCore.QRect(50, 30, 471, 41))
+        self.plainTextEdit.setGeometry(QtCore.QRect(20, 20, 471, 41))
         self.plainTextEdit.setStyleSheet(_fromUtf8("font: 63 11pt \"Ubuntu\";"))
         self.plainTextEdit.setObjectName(_fromUtf8("plainTextEdit"))
-        self.plainTextEdit.setReadOnly(True)
         self.newButton = QtGui.QPushButton(self.centralwidget)
-        self.newButton.setGeometry(QtCore.QRect(560, 20, 101, 51))
+        self.newButton.setGeometry(QtCore.QRect(510, 10, 101, 51))
         self.newButton.setObjectName(_fromUtf8("newButton"))
+        self.StartPumpButton = QtGui.QPushButton(self.centralwidget)
+        self.StartPumpButton.setGeometry(QtCore.QRect(870, 10, 101, 51))
+        self.StartPumpButton.setObjectName(_fromUtf8("StartPumpButton"))
+        self.StopPumpButton = QtGui.QPushButton(self.centralwidget)
+        self.StopPumpButton.setGeometry(QtCore.QRect(990, 10, 101, 51))
+        self.StopPumpButton.setObjectName(_fromUtf8("StopPumpButton"))
+        self.force_graph = PlotWidget(self.centralwidget)
+        self.force_graph.setGeometry(QtCore.QRect(10, 330, 1091, 251))
+        self.force_graph.setObjectName(_fromUtf8("force_graph"))
+        self.displacement_graph = PlotWidget(self.centralwidget)
+        self.displacement_graph.setGeometry(QtCore.QRect(10, 590, 1091, 251))
+        self.displacement_graph.setObjectName(_fromUtf8("displacement_graph"))
         TeledynePlotter.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(TeledynePlotter)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1126, 25))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1126, 20))
         self.menubar.setObjectName(_fromUtf8("menubar"))
         TeledynePlotter.setMenuBar(self.menubar)
         self.statusbar = QtGui.QStatusBar(TeledynePlotter)
@@ -63,5 +74,7 @@ class Ui_TeledynePlotter(object):
         self.startButton.setText(_translate("TeledynePlotter", "Start Test", None))
         self.stopButton.setText(_translate("TeledynePlotter", "Stop Test", None))
         self.newButton.setText(_translate("TeledynePlotter", "New Test", None))
+        self.StartPumpButton.setText(_translate("TeledynePlotter", "Start Pump", None))
+        self.StopPumpButton.setText(_translate("TeledynePlotter", "Stop Pump", None))
 
 from pyqtgraph import PlotWidget
